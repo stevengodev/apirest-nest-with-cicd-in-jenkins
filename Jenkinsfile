@@ -23,7 +23,7 @@ pipeline {
         
             steps {
                 
-                withCredentials([usernamePassword(usernameVariable:"USERNAME_GITHUB", passwordVariable:"PASSWORD_GITHUB", credentialsId:"GITHUB_CREDENTIALS")]){
+                withCredentials([usernamePassword(usernameVariable:"USERNAME_GITHUB", passwordVariable:"PASSWORD_GITHUB", credentialsId:"token-github")]){
                     sh "git clone https://${USERNAME_GITHUB}:${PASSWORD_GITHUB}@github.com/stevengodev/apirest-nest-with-cicd-in-jenkins.git"
                 }
 
