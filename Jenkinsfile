@@ -80,10 +80,10 @@ pipeline {
 
     post {
         success {
-            slackSend(channel: "${SLACK_CHANNEL}", color: '#00ff37', message: "Analysis succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            slackSend(channel: "#todo-foliacotest", color: '#00ff37', message: "Analysis succeeded: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
         }
         failure {
-            slackSend(channel: "${SLACK_CHANNEL}", color: '#FF0000', message: "Analysis failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
+            slackSend(channel: "#todo-foliacotest", color: '#FF0000', message: "Analysis failed: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
         }
     }
 
