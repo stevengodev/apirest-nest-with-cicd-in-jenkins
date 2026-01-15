@@ -1,0 +1,62 @@
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: postgres_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nestdb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nest_network
+
+  jenkins: 
+    container_name: jenkins-container
+    image: jenkins/jenkins:lts
+    restart: unless-stopped
+    ports:
+      - 8080:8080
+      - 50000:50000
+    volumes:
+        - jenkins-data:/var/jenkins_home
+        - jenkins-docker-certs:/certs/client
+        - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - nest_network
+
+  sonarqube:
+    container_name: sonarqube-container
+    image: sonarqube:9-community
+    restart: unless-stopped
+    environment:
+      - sonar.jdbc.username=admin
+      - sonar.jdbc.password=admin
+      - sonar.search.javaAdditionalOpts=-Dbootstrap.system_call_filter=false
+    ports:
+      - 9000:9000
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+      - sonarqube_temp:/opt/sonarqube/temp
+    networks:
+      - nest_network
+
+volumes:
+  postgres_data:
+  jenkins-data: 
+  jenkins-docker-certs: 
+  sonarqube_data: 
+  sonarqube_extensions: 
+  sonarqube_logs: 
+  sonarqube_temp: 
+
+networks:
+  nest_network:
+

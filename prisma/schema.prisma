@@ -1,0 +1,117 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  ADMIN
+}
+
+// Usuarios
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  lastName  String
+  email     String    @unique
+  password  String
+  role      Role  @default(CUSTOMER)
+
+  isActive  Boolean   @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  orders    Order[]
+}
+
+// Categorias
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  description String?
+
+  isActive  Boolean   @default(true)
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  products  Product[]
+}
+
+
+// Productos
+
+enum ProductStatus {
+  ACTIVE
+  INACTIVE
+  OUT_OF_STOCK
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  stock       Int
+  status      ProductStatus  @default(ACTIVE)
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  categoryId  String
+  category    Category       @relation(fields: [categoryId], references: [id])
+
+  orderItems  OrderItem[]
+}
+
+
+
+//Ordenes
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELLED
+}
+
+
+model Order {
+  id        String       @id @default(uuid())
+  total     Float
+  status    OrderStatus  @default(PENDING)
+
+  createdAt DateTime     @default(now())
+
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+
+  items     OrderItem[]
+}
+
+
+
+model OrderItem {
+  id        String   @id @default(uuid())
+  quantity  Int
+  price     Float
+
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id])
+
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+}
