@@ -13,24 +13,6 @@ pipeline {
     
     stages {
 
-        stage("Clean workspace"){
-            steps {
-                cleanWs()
-            }
-        }
-
-        stage('Clone project') {
-        
-            steps {
-                
-                withCredentials([usernamePassword(usernameVariable:"USERNAME_GITHUB", passwordVariable:"PASSWORD_GITHUB", credentialsId:"token-github")]){
-                    sh "git clone https://${USERNAME_GITHUB}:${PASSWORD_GITHUB}@github.com/stevengodev/apirest-nest-with-cicd-in-jenkins.git"
-                }
-
-            }    
-
-        }
-
         stage("Install"){
             steps {
                 slackSend(channel: "${SLACK_CHANNEL}", color: '#00ff37', message: "Install Started: ${env.JOB_NAME} ${env.BUILD_NUMBER}")
