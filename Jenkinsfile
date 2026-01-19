@@ -57,6 +57,22 @@ pipeline {
                 }
             }
         }
+
+        stage("Docker Build and Push"){
+            steps {
+                script {
+                    withCredentials([usernamePassword(usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASSWORD", credentialsId: "TOKEN_DOCKER")]){
+                        sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}"
+
+                        def imageTag = "${DOCKER_USER}/product-user:${env.BUILD_NUMBER}"
+                        sh "docker build -t ${imageTag} ."
+                        sh "docker push ${imageTag}"
+
+                    }
+                    
+                }
+            }
+        }
     
     }
 
