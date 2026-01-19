@@ -36,9 +36,13 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY prisma ./prisma
 
+# Crear usuario no-root por seguridad
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nestjs -u 1001
+
+USER nestjs
 
 # Exponer puerto
 EXPOSE 3000
 
-# Ejecutar con dumb-init para manejo correcto de señales
 CMD ["node", "dist/main"]
