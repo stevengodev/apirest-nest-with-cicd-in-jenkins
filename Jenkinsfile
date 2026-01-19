@@ -9,6 +9,7 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonarqube-scanner'
         SLACK_CHANNEL = "#todo-foliacotest"
+        DOCKERHUB_CREDENTIALS = credentials('TOKEN_DOCKER')
     }
     
     stages {
