@@ -9,6 +9,9 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonarqube-scanner'
         SLACK_CHANNEL = "#todo-foliacotest"
+        registry = "stevengodev/product-user"
+        registryCredential = 'TOKEN_DOCKER'
+        dockerImage = ''
         DOCKERHUB_CREDENTIALS = credentials('TOKEN_DOCKER')
     }
     
@@ -28,6 +31,24 @@ pipeline {
                 sh 'npm run build'
             }
         }
+
+        stage('Building our image') { 
+            steps { 
+                script { 
+                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
+                }
+            } 
+        }
+
+        stage('Deploy our image') { 
+            steps { 
+                script { 
+                    docker.withRegistry( '', registryCredential ) { 
+                        dockerImage.push() 
+                    }
+                } 
+            }
+        } 
 
         stage("SonarQube analysis"){
             steps {
