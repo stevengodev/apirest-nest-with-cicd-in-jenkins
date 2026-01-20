@@ -9,9 +9,6 @@ pipeline {
     environment {
         SCANNER_HOME = tool 'sonarqube-scanner'
         SLACK_CHANNEL = "#todo-foliacotest"
-        registry = "stevengodev/product-user"
-        registryCredential = 'TOKEN_DOCKER'
-        dockerImage = ''
         DOCKERHUB_CREDENTIALS = credentials('TOKEN_DOCKER')
     }
     
@@ -31,24 +28,6 @@ pipeline {
                 sh 'npm run build'
             }
         }
-
-        stage('Building our image') { 
-            steps { 
-                script { 
-                    dockerImage = docker.build registry + ":$BUILD_NUMBER" 
-                }
-            } 
-        }
-
-        stage('Deploy our image') { 
-            steps { 
-                script { 
-                    docker.withRegistry( '', registryCredential ) { 
-                        dockerImage.push() 
-                    }
-                } 
-            }
-        } 
 
         stage("SonarQube analysis"){
             steps {
@@ -80,21 +59,22 @@ pipeline {
             }
         }
 
-        stage("Docker Build and Push"){
-            steps {
-                script {
-                    withCredentials([usernamePassword(usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASSWORD", credentialsId: "TOKEN_DOCKER")]){
-                        sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}"
+        // No funciona en este momento
+        // stage("Docker Build and Push"){
+        //     steps {
+        //         script {
+        //             withCredentials([usernamePassword(usernameVariable: "DOCKER_USER", passwordVariable: "DOCKER_PASSWORD", credentialsId: "TOKEN_DOCKER")]){
+        //                 sh "docker login -u ${DOCKER_USER} -p ${DOCKER_PASSWORD}"
 
-                        def imageTag = "${DOCKER_USER}/product-user:${env.BUILD_NUMBER}"
-                        sh "docker build -t ${imageTag} ."
-                        sh "docker push ${imageTag}"
+        //                 def imageTag = "${DOCKER_USER}/product-user:${env.BUILD_NUMBER}"
+        //                 sh "docker build -t ${imageTag} ."
+        //                 sh "docker push ${imageTag}"
 
-                    }
+        //             }
                     
-                }
-            }
-        }
+        //         }
+        //     }
+        // }
     
     }
 
